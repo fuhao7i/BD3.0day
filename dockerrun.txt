@@ -1,0 +1,163 @@
+student@905-11:~$ docker info
+Got permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Get http://%2Fvar%2Frun%2Fdocker.sock/v1.37/info: dial unix /var/run/docker.sock: connect: permission denied
+student@905-11:~$ su
+Password: 
+root@905-11:/home/student# docker info
+Containers: 0
+ Running: 0
+ Paused: 0
+ Stopped: 0
+Images: 0
+Server Version: 18.03.1-ce
+Storage Driver: overlay2
+ Backing Filesystem: extfs
+ Supports d_type: true
+ Native Overlay Diff: true
+Logging Driver: json-file
+Cgroup Driver: cgroupfs
+Plugins:
+ Volume: local
+ Network: bridge host macvlan null overlay
+ Log: awslogs fluentd gcplogs gelf journald json-file logentries splunk syslog
+Swarm: inactive
+Runtimes: runc
+Default Runtime: runc
+Init Binary: docker-init
+containerd version: 773c489c9c1b21a6d78b5c538cd395416ec50f88
+runc version: 4fc53a81fb7c994640722ac585fa9ca548971871
+init version: 949e6fa
+Security Options:
+ seccomp
+  Profile: default
+Kernel Version: 4.9.65-BOOTLoader-AMD64
+Operating System: Ubuntu 16.04 LTS
+OSType: linux
+Architecture: x86_64
+CPUs: 4
+Total Memory: 3.822GiB
+Name: 905-11
+ID: S7KR:SCYV:64ND:6XF7:HKNB:GPPG:3EOY:ADOL:YXJK:IS4X:F2VO:J6FI
+Docker Root Dir: /var/lib/docker
+Debug Mode (client): false
+Debug Mode (server): false
+Registry: https://index.docker.io/v1/
+Labels:
+Experimental: false
+Insecure Registries:
+ 127.0.0.0/8
+Live Restore Enabled: false
+
+WARNING: No swap limit support
+root@905-11:/home/student# docker run 
+"docker run" requires at least 1 argument.
+See 'docker run --help'.
+
+Usage:  docker run [OPTIONS] IMAGE [COMMAND] [ARG...] [flags]
+
+Run a command in a new container
+root@905-11:/home/student# cd /etc/docker
+root@905-11:/etc/docker# ls
+key.json
+root@905-11:/etc/docker# cat > daemon.json
+"registry-mirrors": ["https://20lk1eo1.mirror.aliyuncs.com"]
+root@905-11:/etc/docker# systemctl daemon-reload
+root@905-11:/etc/docker# systemctl restart docker
+Job for docker.service failed because the control process exited with error code. See "systemctl status docker.service" and "journalctl -xe" for details.
+root@905-11:/etc/docker# docker pull centos
+Using default tag: latest
+Warning: failed to get default registry endpoint from daemon (Cannot connect to the Docker daemon at unix:///var/run/docker.sock. Is the docker daemon running?). Using system default: https://index.docker.io/v1/
+Cannot connect to the Docker daemon at unix:///var/run/docker.sock. Is the docker daemon running?
+root@905-11:/etc/docker# ls
+daemon.json  key.json
+root@905-11:/etc/docker# ls -al
+total 24
+drwx------   2 root root  4096 Jun 20 19:10 .
+drwxr-xr-x 132 root root 12288 Jun 20 19:03 ..
+-rw-r--r--   1 root root    61 Jun 20 19:11 daemon.json
+-rw-------   1 root root   244 Jun 20 19:03 key.json
+root@905-11:/etc/docker# cat key.json
+{"crv":"P-256","d":"fcV6XB9Z5QM2w5Gsf7IAE1e813UTRF5k1qRVuySpvo8","kid":"S7KR:SCYV:64ND:6XF7:HKNB:GPPG:3EOY:ADOL:YXJK:IS4X:F2VO:J6FI","kty":"EC","x":"FMteNIDhWhw8F_NV5mL071u0jhbig6AxlyFQ2pBdwHA","y":"6nk8TsupeIrebZqSlxSyXfwu7IE7bencLYrmAeqfRV8"}root@905-11:/etc/docker# rm daemon.json
+root@905-11:/etc/docker# sudo mkdir -p /etc/docker
+root@905-11:/etc/docker# sudo tee /etc/docker/daemon.json <<-'EOF'
+> {
+>   "registry-mirrors": ["https://20lk1eo1.mirror.aliyuncs.com"]
+> }
+> EOF
+{
+  "registry-mirrors": ["https://20lk1eo1.mirror.aliyuncs.com"]
+}
+root@905-11:/etc/docker# sudo systemctl daemon-reload
+root@905-11:/etc/docker# sudo systemctl restart docker
+root@905-11:/etc/docker# 
+root@905-11:/etc/docker# docker pull centos
+Using default tag: latest
+latest: Pulling from library/centos
+8ba884070f61: Pull complete 
+Digest: sha256:b5e66c4651870a1ad435cd75922fe2cb943c9e973a9673822d1414824a1d0475
+Status: Downloaded newer image for centos:latest
+root@905-11:/etc/docker# docker run -it --name data1 --rm centos /bin/bash
+[root@b18b5f87f6b7 /]# ls
+anaconda-post.log  dev  home  lib64  mnt  proc  run   srv  tmp  var
+bin                etc  lib   media  opt  root  sbin  sys  usr
+[root@b18b5f87f6b7 /]# cd /home
+[root@b18b5f87f6b7 home]# ls
+[root@b18b5f87f6b7 home]# mkdir workspace
+[root@b18b5f87f6b7 home]# cd workspace
+[root@b18b5f87f6b7 workspace]# cat  > test.sh <<EOF
+> #!/bin/bash
+> echo "hello"
+> EOF
+[root@b18b5f87f6b7 workspace]# bash test.sh
+hello
+[root@b18b5f87f6b7 workspace]# 
+
+
+
+
+--------------------------------------------------------------------------------
+================================================================================
+student@905-11:~$ su
+Password: 
+root@905-11:/home/student# docker ps
+CONTAINER ID        IMAGE               COMMAND             CREATED              STATUS              PORTS               NAMES
+b18b5f87f6b7        centos              "/bin/bash"         About a minute ago   Up About a minute                       data1
+root@905-11:/home/student# docker commit b18b5f87f6b7 centos:ly
+sha256:15686da9259efb33c5bfa01c59b2283bb16017964acd27358286c61a5b033587
+root@905-11:/home/student# docker images
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+centos              ly                  15686da9259e        9 seconds ago       202MB
+centos              latest              9f38484d220f        3 months ago        202MB
+root@905-11:/home/student# docker push centos:ly
+The push refers to repository [docker.io/library/centos]
+0f1f7884d0db: Preparing 
+d69483a6face: Preparing 
+denied: requested access to the resource is denied
+root@905-11:/home/student# docker tag centos:ly lowyard/centos:ly
+root@905-11:/home/student# docker login
+Login with your Docker ID to push and pull images from Docker Hub. If you don't have a Docker ID, head over to https://hub.docker.com to create one.
+Username: fuhao7i
+Password: 
+Login Succeeded
+root@905-11:/home/student# docker tag centos:ly fuhao7i/centos:ly
+root@905-11:/home/student# docker images
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+fuhao7i/centos      ly                  15686da9259e        4 minutes ago       202MB
+centos              ly                  15686da9259e        4 minutes ago       202MB
+lowyard/centos      ly                  15686da9259e        4 minutes ago       202MB
+centos              latest              9f38484d220f        3 months ago        202MB
+root@905-11:/home/student# docker push fuhaot7i/centos:ly
+The push refers to repository [docker.io/fuhaot7i/centos]
+An image does not exist locally with the tag: fuhaot7i/centos
+root@905-11:/home/student# docker ps
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+b18b5f87f6b7        centos              "/bin/bash"         7 minutes ago       Up 7 minutes                            data1
+root@905-11:/home/student# docker push fuhao7i/centos
+The push refers to repository [docker.io/fuhao7i/centos]
+0f1f7884d0db: Pushed 
+d69483a6face: Mounted from library/centos 
+ly: digest: sha256:b35156fbb16e662558a79882cfb51f84a40380d60377ffcd66730631b381da73 size: 736
+root@905-11:/home/student# 
+
+
+
+
